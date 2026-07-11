@@ -27,7 +27,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      images: [`/roast/${slug.join("/")}/opengraph-image`],
+      images: [`/api/og/${slug.join("/")}`],
     },
     twitter: { card: "summary_large_image", title, description },
   };
