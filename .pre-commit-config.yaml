@@ -1,0 +1,31 @@
+# repo-roast pre-commit hygiene. A repo that roasts secret leaks must be
+# immaculate about its own: gitleaks runs on every commit, here and in CI.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      # Node hooks no-op until the package.json lands (bootstrap ordering);
+      # after that they gate every commit.
+      - id: prettier
+        name: prettier (check)
+        language: system
+        entry: bash -c 'test -f package.json || exit 0; pnpm exec prettier --check "$@"' --
+        types_or: [ts, tsx, javascript, jsx, json, css, markdown, yaml]
+        exclude: ^(pnpm-lock\.yaml|src/lib/scanners/fixtures/)
+      - id: eslint
+        name: eslint
+        language: system
+        entry: bash -c 'test -f package.json || exit 0; pnpm exec eslint "$@"' --
+        types_or: [ts, tsx]
+        exclude: ^src/lib/scanners/fixtures/
+        pass_filenames: true
+      - id: tsc
+        name: tsc --noEmit
+        language: system
+        entry: bash -c 'test -f package.json || exit 0; pnpm exec tsc --noEmit'
+        types_or: [ts, tsx]
+        pass_filenames: false

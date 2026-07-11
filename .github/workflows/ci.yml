@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history — we roast history leaks, ours must be clean
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  checks:
+    name: Lint, type-check, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Guard lets CI stay green on the pre-skeleton bootstrap commit.
+      - name: Detect Node project
+        id: node
+        run: test -f package.json && echo "present=true" >> "$GITHUB_OUTPUT" || echo "present=false" >> "$GITHUB_OUTPUT"
+      - if: steps.node.outputs.present == 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - if: steps.node.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - if: steps.node.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.node.outputs.present == 'true'
+        run: pnpm lint
+      - if: steps.node.outputs.present == 'true'
+        run: pnpm typecheck
+      - if: steps.node.outputs.present == 'true'
+        run: pnpm test
+      - if: steps.node.outputs.present == 'true'
+        run: pnpm build
