@@ -41,7 +41,14 @@ export default function Home() {
         </p>
         <p className="mt-1">
           Public mode uses only public data. Want to scan your <em>private</em>{" "}
-          repos? Self-host it — your token never leaves your machine. See the{" "}
+          repos?{" "}
+          <Link
+            href="/private"
+            className="text-[var(--color-ember)] underline underline-offset-2"
+          >
+            Private mode
+          </Link>{" "}
+          (self-hosted) keeps your token on your own machine. See the{" "}
           <a
             href="https://github.com/Lonkins/repo-roast#readme"
             className="text-[var(--color-ember)] underline underline-offset-2"
