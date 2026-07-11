@@ -1,0 +1,14 @@
+# repo-roast gitleaks config. Extends the default ruleset; allowlists only the
+# paths that intentionally contain SYNTHETIC (fake) secrets for scanner tests.
+# Nothing here weakens detection on real source.
+title = "repo-roast"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Synthetic secrets used to test the scanner — fabricated, never real"
+paths = [
+  '''src/lib/scanners/fixtures/.*''',
+  '''src/lib/scanners/secrets/.*\.test\.ts''',
+]
