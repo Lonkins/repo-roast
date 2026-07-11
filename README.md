@@ -10,7 +10,7 @@ repo-roast finds real security problems — secrets in commit history, dangerous
 
 **repo-roast punches up at the code, never down at the person.**
 
-- Every joke targets a *finding* — a file, a workflow, a dependency — never the human who wrote it.
+- Every joke targets a _finding_ — a file, a workflow, a dependency — never the human who wrote it.
 - Every finding ships with a real, actionable fix. The roast is the sugar; the fix is the medicine.
 - Public mode uses only public data. Private mode scans **your own** repos, with your own token, on your own instance.
 - A clean repo gets a (grudgingly) complimentary roast. We never invent flaws for laughs.
