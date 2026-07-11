@@ -3,6 +3,7 @@ import type { Roast } from "@/lib/roast";
 import { ScoreBadge } from "./ScoreBadge";
 import { FindingCard } from "./FindingCard";
 import { ShareBar } from "./ShareBar";
+import { BadgeSnippet } from "./BadgeSnippet";
 
 interface RoastResultProps {
   report: ScanReport;
@@ -55,6 +56,8 @@ export function RoastResult({ report, roast, slug }: RoastResultProps) {
           })}
         </div>
       )}
+
+      <BadgeSnippet slug={slug} />
 
       <footer className="border-t-[3px] border-[var(--color-ink)]/20 pt-4 text-sm text-[var(--color-ink-dim)]">
         <p>{roast.outro}</p>
