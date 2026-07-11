@@ -34,9 +34,7 @@ jobs:
         id: node
         run: test -f package.json && echo "present=true" >> "$GITHUB_OUTPUT" || echo "present=false" >> "$GITHUB_OUTPUT"
       - if: steps.node.outputs.present == 'true'
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+        uses: pnpm/action-setup@v4 # version comes from package.json packageManager
       - if: steps.node.outputs.present == 'true'
         uses: actions/setup-node@v4
         with:

@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+/* Design tokens — "comedy club neo-brutalism": near-black stage, ember accent,
+   chunky borders. The roast happens under a spotlight. */
+:root {
+  --color-stage: oklch(16% 0.015 285);
+  --color-stage-raised: oklch(21% 0.02 285);
+  --color-ink: oklch(96% 0.005 90);
+  --color-ink-dim: oklch(72% 0.01 90);
+  --color-ember: oklch(68% 0.19 40);
+  --color-ember-hot: oklch(75% 0.21 55);
+  --color-mint: oklch(80% 0.14 165);
+  --color-warn: oklch(80% 0.16 85);
+
+  --font-display: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  --font-body: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --border-chunky: 3px solid var(--color-ink);
+  --shadow-slab: 6px 6px 0 0 oklch(0% 0 0 / 0.55);
+
+  --duration-fast: 150ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@theme inline {
+  --color-stage: var(--color-stage);
+  --color-stage-raised: var(--color-stage-raised);
+  --color-ink: var(--color-ink);
+  --color-ink-dim: var(--color-ink-dim);
+  --color-ember: var(--color-ember);
+  --color-ember-hot: var(--color-ember-hot);
+  --color-mint: var(--color-mint);
+  --color-warn: var(--color-warn);
+}
+
+body {
+  background: var(--color-stage);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
