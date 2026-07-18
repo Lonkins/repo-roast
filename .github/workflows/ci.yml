@@ -17,7 +17,7 @@ jobs:
     name: Secret scan (gitleaks)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # full history — we roast history leaks, ours must be clean
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
@@ -28,7 +28,7 @@ jobs:
     name: Lint, type-check, test, build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Guard lets CI stay green on the pre-skeleton bootstrap commit.
       - name: Detect Node project
         id: node
