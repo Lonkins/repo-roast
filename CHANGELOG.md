@@ -2,6 +2,23 @@
 
 All notable changes to repo-roast are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com); this project uses [Conventional Commits](https://www.conventionalcommits.org).
 
+## [Unreleased] — AI-authorship audit pivot
+
+Repositioned from a security-roast toy into a **pre-ship auditor for the AI-assisted era** — catching the mistakes AI-built repos ship that no vulnerability database lists, each with a copy-paste fix for the reader's own AI agent. Direction set by an advisory-panel process; see [ADR 0002](docs/adr/0002-ai-authorship-audit-pivot.md).
+
+### Added
+
+- **`slopsquat` scanner** — hallucinated, typosquatted, and newborn dependencies, resolved against live npm & PyPI registry data (existence, age, version count, edit-distance to popular names). Deterministic; a network failure yields no finding, only a definitive 404 counts.
+- **`exposure` scanner** — insecure defaults a code generator ships: a server secret behind a `NEXT_PUBLIC_`/`VITE_` prefix, `dangerouslyAllowBrowser` LLM keys, wildcard CORS, `unsafe-eval` CSP. Value-redacted.
+- **`agents` scanner** — the AI-agent/MCP attack surface: skipped approval gates (`--dangerously-skip-permissions`, `autoApprove`), unpinned or remote MCP servers, hardcoded MCP secrets.
+- **`claims` scanner** — claims-vs-reality: a README documenting a script/badge the repo doesn't back up, a CI badge for a missing workflow, hardcoded status badges.
+- **Remediation-first output** — every finding now also carries a plain-language **why it bites** and an **`agentPrompt`**: a copy-paste instruction for the reader's own AI coding agent to apply the fix. Rendered on each finding card (with a one-click Copy) and returned by the JSON API.
+
+### Changed
+
+- Repositioned the landing page, README, and finding catalog around the AI-authorship auditor and the remediation loop.
+- Deduplicated the secrets scanner's finding construction into a shared builder shared by the gitleaks and blob-walk strategies.
+
 ## [1.0.0] — 2026-07-11
 
 First public release. A complete, self-hostable security-roast product.

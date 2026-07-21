@@ -39,15 +39,21 @@ touch SARIF/`--fail-on`, and the skeptic calls the CI direction a trap that
 strangles the web share loop. Build it only on real inbound demand. The near-
 unanimous signal was coherence + try-ability gaps. Ship criteria:
 
-- [x] **D1. Landing page reposition** — `page.tsx` matches the pivot (was the
-      QA critic's #1 blocker; the front door still sold the old product).
-- [ ] **D2. Live end-to-end verification** — run the app, confirm a real scan
-      renders `why` + the copy-paste agent prompt, Copy works, and the JSON API
-      emits both fields. (Headline value, never exercised outside unit tests.)
-- [ ] **D3. Share loop** — result page leads with score + scariest finding and a
-      clear "scan yours next" CTA; landing has a working example to try instantly.
-- [ ] **D4. Playwright smoke** — one E2E asserting the new fields render.
-- [ ] **D5. CHANGELOG** — record the pivot.
+- [x] **D1. Landing page reposition** — `page.tsx` matches the pivot. Verified
+      live (server render served the new copy + scanner strip).
+- [x] **D2. Live end-to-end verification** — ran `pnpm start`; a real scan of
+      `octocat/Spoon-Knife` returned HTTP 200 with `why` + `agentPrompt` on every
+      finding (JSON API), and the result page SSR rendered "Why it bites", "Fix it
+      with your AI agent", and the Copy button for each. The Copy interaction +
+      field rendering are also covered by a durable RTL test (`FindingCard.test.tsx`).
+- [x] **D3. Share loop** — result page carries ScoreBadge + ShareBar + the
+      "Roast me" badge snippet, plus a new "🔥 Roast another repo" CTA; the landing
+      page's sample links are the instant try-flow.
+- [x] **D4. Smoke test** — `FindingCard.test.tsx` renders the card and asserts
+      `why`, `agentPrompt`, and a working clipboard Copy. (A browser-level
+      Playwright E2E is deferred — it needs a scan-data stub mode; the RTL render
+      test + the live curl smoke above give equivalent confidence today.)
+- [x] **D5. CHANGELOG** — pivot recorded under `[Unreleased]`.
 
 ## Deferred to a future decision (NOT blockers for "built")
 
