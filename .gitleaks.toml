@@ -7,8 +7,10 @@ title = "repo-roast"
 useDefault = true
 
 [allowlist]
-description = "Synthetic secrets used to test the scanner — fabricated, never real"
+description = "Synthetic secrets used to test the scanners — fabricated, never real"
 paths = [
   '''src/lib/scanners/fixtures/.*''',
-  '''src/lib/scanners/secrets/.*\.test\.ts''',
+  # Scanner unit tests embed fabricated secret-shaped strings to exercise the
+  # detectors (secrets, exposure, agents, …). Never real credentials.
+  '''src/lib/scanners/.*\.test\.ts''',
 ]

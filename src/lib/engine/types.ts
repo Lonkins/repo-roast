@@ -6,7 +6,13 @@
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 
 export type ScannerId =
-  "secrets" | "workflows" | "deps" | "hygiene" | "slopsquat" | "exposure";
+  | "secrets"
+  | "workflows"
+  | "deps"
+  | "hygiene"
+  | "slopsquat"
+  | "exposure"
+  | "agents";
 
 /** Where a finding was observed. Everything factual, nothing invented. */
 export interface Evidence {

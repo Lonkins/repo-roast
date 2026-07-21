@@ -12,8 +12,9 @@ Each increment is a self-contained, tested step. Check items off as they land.
       (server secret behind `NEXT_PUBLIC_`/`VITE_`/… — name-based, low FP),
       `llm-key-in-browser` (`dangerouslyAllowBrowser: true`), `permissive-cors`
       (wildcard, escalated with credentials), `unsafe-eval-csp`.
-- [ ] **1c. `agents`** — agent/MCP config attack surface (`.mcp.json`,
-      `.cursor/`, `.claude/settings*.json`, auto-approve / skip-permissions).
+- [x] **1c. `agents`** — agent/MCP config attack surface: `auto-approved-execution`
+      (skip-permissions / bypass / autoApprove across configs, workflows, scripts),
+      `unpinned-mcp-server`, `remote-mcp-server`, `hardcoded-mcp-secret`.
 - [ ] **1d. `claims`** — claims-vs-reality (README/badge vs actual scripts,
       workflows, config the code references).
 
