@@ -8,8 +8,10 @@ Each increment is a self-contained, tested step. Check items off as they land.
 - [x] **1a. `slopsquat`** — hallucinated / typosquat / newborn dependency
       scanner over real registry data (npm + PyPI). Findings:
       `nonexistent-dependency`, `typosquat-suspect`, `newborn-dependency`.
-- [ ] **1b. `exposure`** — secrets-to-client + insecure scaffold defaults
-      (`NEXT_PUBLIC_` secret leak, CORS `*`, unsafe CSP, RLS-off, debug routes).
+- [x] **1b. `exposure`** — insecure scaffold defaults: `secret-behind-public-prefix`
+      (server secret behind `NEXT_PUBLIC_`/`VITE_`/… — name-based, low FP),
+      `llm-key-in-browser` (`dangerouslyAllowBrowser: true`), `permissive-cors`
+      (wildcard, escalated with credentials), `unsafe-eval-csp`.
 - [ ] **1c. `agents`** — agent/MCP config attack surface (`.mcp.json`,
       `.cursor/`, `.claude/settings*.json`, auto-approve / skip-permissions).
 - [ ] **1d. `claims`** — claims-vs-reality (README/badge vs actual scripts,

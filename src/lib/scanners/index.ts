@@ -3,6 +3,7 @@ import { secretsScanner } from "./secrets";
 import { workflowsScanner } from "./workflows";
 import { depsScanner } from "./deps";
 import { slopsquatScanner } from "./slopsquat";
+import { exposureScanner } from "./exposure";
 import { hygieneScanner } from "./hygiene";
 
 /** The full deterministic scanner set, in report display order. */
@@ -11,5 +12,6 @@ export const allScanners: Scanner[] = [
   workflowsScanner,
   depsScanner,
   slopsquatScanner,
+  exposureScanner,
   hygieneScanner,
 ];
