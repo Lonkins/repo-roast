@@ -15,8 +15,10 @@ Each increment is a self-contained, tested step. Check items off as they land.
 - [x] **1c. `agents`** — agent/MCP config attack surface: `auto-approved-execution`
       (skip-permissions / bypass / autoApprove across configs, workflows, scripts),
       `unpinned-mcp-server`, `remote-mcp-server`, `hardcoded-mcp-secret`.
-- [ ] **1d. `claims`** — claims-vs-reality (README/badge vs actual scripts,
-      workflows, config the code references).
+- [x] **1d. `claims`** — claims-vs-reality: `undefined-script` (README documents
+      a script package.json doesn't define, or the `npm init` test placeholder),
+      `broken-ci-badge` (badge → missing workflow), `decorative-status-badge`
+      (hardcoded coverage/build/tests badge measuring nothing).
 
 ## Increment 2 — Remediation-first output (the differentiator)
 

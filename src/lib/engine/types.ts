@@ -12,7 +12,8 @@ export type ScannerId =
   | "hygiene"
   | "slopsquat"
   | "exposure"
-  | "agents";
+  | "agents"
+  | "claims";
 
 /** Where a finding was observed. Everything factual, nothing invented. */
 export interface Evidence {
