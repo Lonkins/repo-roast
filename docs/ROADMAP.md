@@ -30,18 +30,38 @@ Each increment is a self-contained, tested step. Check items off as they land.
       (`FindingCard` + `CopyButton`). JSON API already returns them (they live on
       `Finding`, which `/api/roast` serializes wholesale).
 
-## Increment 3 — Local CLI + machine-readable output (pre-ship gate)
+## Definition of done — decided by the 2026-07-22 panel (5 seats)
 
-- [ ] **3a.** `bin` CLI: scan a local checkout offline; `--format pretty|json|sarif`.
-- [ ] **3b.** SARIF renderer (map `Finding` → SARIF result: id→ruleId,
-      severity→level, evidence→physicalLocation, fix→fix.description).
-- [ ] **3c.** Exit codes + `--fail-on <severity>` for CI-optional use.
+The core auditor (Increments 1 + 2) is complete. A focused panel (platform eng,
+product skeptic, target-user vibe coder, OSS adopter, QA/release critic) ruled
+the **CI/SARIF CLI is NOT required for "built"** (4 of 5): the target user won't
+touch SARIF/`--fail-on`, and the skeptic calls the CI direction a trap that
+strangles the web share loop. Build it only on real inbound demand. The near-
+unanimous signal was coherence + try-ability gaps. Ship criteria:
 
-## Deferred (panel kill-list — do NOT build without a fresh decision)
+- [x] **D1. Landing page reposition** — `page.tsx` matches the pivot (was the
+      QA critic's #1 blocker; the front door still sold the old product).
+- [ ] **D2. Live end-to-end verification** — run the app, confirm a real scan
+      renders `why` + the copy-paste agent prompt, Copy works, and the JSON API
+      emits both fields. (Headline value, never exercised outside unit tests.)
+- [ ] **D3. Share loop** — result page leads with score + scariest finding and a
+      clear "scan yours next" CTA; landing has a working example to try instantly.
+- [ ] **D4. Playwright smoke** — one E2E asserting the new fields render.
+- [ ] **D5. CHANGELOG** — record the pivot.
 
-Hosted GitHub App / PR-comment bot · org dashboards · accounts / score history ·
-leaderboards · re-fighting Scorecard on supply-chain posture · general
-code-quality metrics (complexity/coverage/style).
+## Deferred to a future decision (NOT blockers for "built")
+
+- **CI/SARIF CLI** (`--format sarif`, `--fail-on`). If a CLI is built, the panel's
+  target user wants a **zero-config `npx repo-roast .` on a local folder** before
+  push — NOT the CI gate. Needs a filesystem `GitHubClient` adapter. Build on
+  demand.
+- **Score recalibration** for 8 scanners — the linear cap saturates at 100 after
+  ~4 criticals and loses discrimination. A saturating curve (`100·(1−e^(−raw/K))`)
+  would fix it; monotonic and correct today, so post-ship (ripples through
+  score/badge/OG tests).
+- Roast-tone toggle for serious findings · hosted GitHub App / PR bot · org
+  dashboards · accounts / score history · leaderboards · re-fighting Scorecard ·
+  general code-quality metrics.
 
 ## Open questions for a future panel
 

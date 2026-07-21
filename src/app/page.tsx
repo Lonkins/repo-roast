@@ -3,21 +3,46 @@ import { RoastForm } from "@/components/RoastForm";
 
 const SAMPLES = ["torvalds", "octocat/Spoon-Knife", "gvanrossum"];
 
+/** The scanner surface, shown as a strip so the reposition is legible at a glance. */
+const CHECKS = [
+  "hallucinated deps",
+  "keys leaked to the browser",
+  "agent / MCP config",
+  "docs that lie",
+  "committed secrets",
+  "cursed Actions",
+];
+
 export default function Home() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
       <div className="flex flex-col items-center gap-4">
         <p className="rounded-full border-2 border-[var(--color-ember)] px-3 py-1 text-xs font-bold tracking-widest text-[var(--color-ember)] uppercase">
-          Deterministic scan · comedic delivery
+          Pre-ship audit for the AI era · deterministic
         </p>
         <h1 className="text-5xl font-black tracking-tight sm:text-7xl">
           repo-roast <span aria-hidden>🔥</span>
         </h1>
         <p className="max-w-xl text-lg text-[var(--color-ink-dim)]">
-          We find the real security problems in a GitHub profile — secrets in
-          history, cursed Actions workflows, vulnerable dependencies — and
-          deliver them as a roast. Every burn comes with the fix.
+          Building with AI is fast — and AI-built repos ship a whole class of
+          mistakes no vuln scanner lists: a{" "}
+          <strong>dependency the model invented</strong>, a service key placed
+          behind <code>NEXT_PUBLIC_</code> so it{" "}
+          <strong>ships to the browser</strong>, an agent config with the
+          guardrails switched off, a README that promises a test that isn&apos;t
+          there. We find them, roast them, and hand you a{" "}
+          <strong>copy-paste fix for your own AI agent</strong>.
         </p>
+        <ul className="flex flex-wrap items-center justify-center gap-2">
+          {CHECKS.map((c) => (
+            <li
+              key={c}
+              className="rounded-md border-2 border-[var(--color-ink)]/25 bg-[var(--color-stage-raised)]/60 px-2.5 py-1 text-xs font-semibold text-[var(--color-ink-dim)]"
+            >
+              {c}
+            </li>
+          ))}
+        </ul>
       </div>
 
       <RoastForm autoFocus />
