@@ -95,12 +95,12 @@ describe("hygiene scanner", () => {
     expect(ids).not.toContain("hygiene/missing-license");
   });
 
-  test("every finding carries a concrete fix", async () => {
+  test("every finding carries a fix, a why, and an agent prompt", async () => {
     const findings = await hygieneScanner.scan(
       makeRepo(),
       ctxWith(["deploy/id_rsa", "node_modules/x/i.js"]),
     );
     expect(findings.length).toBeGreaterThan(0);
-    expect(findings.every((f) => f.fix.length > 0)).toBe(true);
+    expect(findings.every((f) => f.fix && f.why && f.agentPrompt)).toBe(true);
   });
 });

@@ -58,6 +58,8 @@ export const hygieneScanner: Scanner = {
           detail: "Files like this usually shouldn't be tracked at all.",
         },
         fix: `Remove ${match} from the repo, add its pattern to .gitignore, purge it from history with git-filter-repo, and rotate anything it may have exposed.`,
+        why: `Anyone who clones the repo gets ${label}. Deleting the file later doesn't help — it stays in git history for anyone to check out until you rewrite history and rotate the credential.`,
+        agentPrompt: `The repo tracks ${match}, which is ${label} and should never be committed. Remove it from the working tree, add its pattern to .gitignore, and give me the exact git-filter-repo (or BFG) commands to purge it from all of history. Remind me to rotate any credential it may have exposed and to force-push.`,
       });
     }
 
@@ -77,6 +79,8 @@ export const hygieneScanner: Scanner = {
           detail: "Generated files bloat the repo and cause noisy diffs.",
         },
         fix: `Add ${artifact.replace(/\/$/, "")} to .gitignore and remove it with \`git rm -r --cached ${artifact.replace(/\/$/, "")}\`.`,
+        why: `Generated files balloon clone size and every rebuild produces a giant, unreviewable diff that buries the real changes — and stale committed artifacts drift out of sync with the source they came from.`,
+        agentPrompt: `The repo commits the generated directory ${artifact.replace(/\/$/, "")}. Add it to .gitignore, remove it from tracking with \`git rm -r --cached ${artifact.replace(/\/$/, "")}\`, and confirm it is reproducible from a clean build so nothing is lost.`,
       });
     }
 
@@ -93,6 +97,9 @@ export const hygieneScanner: Scanner = {
             "Without a disclosure policy, finders either open a public issue or give up.",
         },
         fix: "Add a SECURITY.md describing how to privately report vulnerabilities (a contact and expected response time). GitHub links it automatically.",
+        why: "When someone finds a vulnerability and has nowhere private to send it, they either drop it in a public issue (now everyone sees it before you can fix it) or don't tell you at all.",
+        agentPrompt:
+          "Add a SECURITY.md to this repo describing how to privately report a vulnerability: a contact method (a security email or GitHub private advisories), the expected response time, and which versions are supported. Keep it short and use GitHub's standard format so it's linked automatically.",
       });
     }
 
@@ -114,6 +121,9 @@ export const hygieneScanner: Scanner = {
           detail: "No license means default copyright: all rights reserved.",
         },
         fix: "Add a LICENSE file. If you want people to use the code, pick one at choosealicense.com (MIT and Apache-2.0 are common defaults).",
+        why: "With no license the default is all-rights-reserved: legally nobody may use, copy, or build on your code. Careful teams won't touch it, so the repo can't get the adoption or contributions you published it for.",
+        agentPrompt:
+          "This public repo has no LICENSE file. Add one: if I want people to freely use the code, MIT is the simplest permissive choice and Apache-2.0 adds an explicit patent grant. Create the LICENSE file with the correct copyright line, and mention the license in the README.",
       });
     }
 

@@ -51,6 +51,8 @@ export function RoastResult({ report, roast, slug }: RoastResultProps) {
                 title={finding?.title ?? line.findingId}
                 evidenceUrl={finding?.evidence.url}
                 evidencePath={finding?.evidence.path}
+                why={finding?.why}
+                agentPrompt={finding?.agentPrompt}
               />
             );
           })}

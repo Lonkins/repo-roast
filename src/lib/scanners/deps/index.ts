@@ -51,6 +51,8 @@ function toFinding(repo: RepoRef, result: OsvResult): Finding {
         `${pkg.ecosystem} package ${pkg.name}@${pkg.version} is affected by ${idLabel}.`,
     },
     fix: `Upgrade ${pkg.name} to a patched version (check the advisory for the fixed range), then regenerate the lockfile. Automate this with Dependabot or Renovate so it doesn't rot again.`,
+    why: `A published advisory means the exact flaw and often a working exploit are public. Anyone can look up ${idLabel}, see you ship the vulnerable version, and use it against your app.`,
+    agentPrompt: `The dependency ${pkg.name}@${pkg.version} (in ${pkg.source}) is affected by ${idLabel}. Upgrade it to the nearest version that patches the advisory, update the lockfile, and run the tests to confirm nothing broke. Then add Dependabot or Renovate config so this doesn't rot again.`,
   };
 }
 
