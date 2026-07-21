@@ -1,5 +1,6 @@
 import type { Finding, RepoRef, ScanContext } from "../../engine/types";
 import { matchSecrets } from "./rules";
+import { committedDotenvFinding, leakedCredentialFinding } from "./findings";
 
 /** Commits walked per repo — bounded to respect API rate limits. */
 export const HISTORY_COMMIT_LIMIT = 30;
@@ -28,19 +29,7 @@ export async function blobWalkSecrets(
 
   // Committed .env in the current tree — the classic.
   for (const path of paths.filter(isCommittedDotenv)) {
-    findings.push({
-      id: "secrets/committed-dotenv",
-      scanner: "secrets",
-      severity: "high",
-      title: `.env file committed to the repository (${path})`,
-      evidence: {
-        repo: repoName,
-        path,
-        url: `https://github.com/${repoName}/blob/${repo.defaultBranch}/${path}`,
-        detail: "Environment files typically hold credentials in plaintext.",
-      },
-      fix: `Remove ${path} from the repo, add it to .gitignore, commit a redacted ${path}.example instead, rotate every credential it contained, then purge it from history with git-filter-repo.`,
-    });
+    findings.push(committedDotenvFinding(repo, path));
   }
 
   // Walk recent history patches for secret-shaped additions.
@@ -57,25 +46,16 @@ export async function blobWalkSecrets(
         const key = `${match.rule.id}:${path}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        const stillInTree = livePaths.has(path);
-        findings.push({
-          id: stillInTree
-            ? "secrets/leaked-credential"
-            : "secrets/leaked-credential-history",
-          scanner: "secrets",
-          severity: "critical",
-          title: stillInTree
-            ? `${match.rule.description} committed in ${path}`
-            : `${match.rule.description} in commit history (${path} since deleted — the secret is still in history)`,
-          evidence: {
-            repo: repoName,
+        findings.push(
+          leakedCredentialFinding(repo, {
             path,
             ref: commit.sha,
             url: `https://github.com/${repoName}/commit/${commit.sha}`,
             detail: `Rule: ${match.rule.id}. Value redacted — check the commit.`,
-          },
-          fix: `Rotate this credential immediately (assume it is compromised), remove it from the code${stillInTree ? "" : " — deleting the file was not enough; git remembers"} and purge it from history with git-filter-repo or BFG, then force-push and invalidate old clones.`,
-        });
+            stillInTree: livePaths.has(path),
+            description: match.rule.description,
+          }),
+        );
       }
     }
   }

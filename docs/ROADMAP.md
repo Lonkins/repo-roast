@@ -23,8 +23,9 @@ Each increment is a self-contained, tested step. Check items off as they land.
 ## Increment 2 — Remediation-first output (the differentiator)
 
 - [x] **2a.** Extend `Finding` with optional `why` + `agentPrompt`. (non-breaking)
-- [x] **2b.** Populate `why`/`agentPrompt` on existing scanners (deps, workflows,
-      hygiene). Remaining: `secrets` (two code paths — blobwalk + gitleaks).
+- [x] **2b.** Populate `why`/`agentPrompt` on all existing scanners. `secrets`
+      done via a shared `secrets/findings.ts` builder (dedupes the fix text that
+      was copy-pasted across the blobwalk + gitleaks strategies).
 - [x] **2c.** Render `why` + copy-paste `agentPrompt` in the result UI
       (`FindingCard` + `CopyButton`). JSON API already returns them (they live on
       `Finding`, which `/api/roast` serializes wholesale).
