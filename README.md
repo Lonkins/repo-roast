@@ -2,7 +2,7 @@
 
 # repo-roast 🔥
 
-**Roast the security posture of any GitHub profile or repo — deterministic scan, comedic delivery, self-hostable for private repos.**
+**A pre-ship auditor for the AI-assisted era. Catch the mistakes AI-built repos actually ship — hallucinated dependencies, keys leaked to the browser, over-permissioned agent configs, docs that lie — each with a real fix _and_ a copy-paste prompt for your AI agent. Deterministic scan, delivered as a roast, self-hostable for private repos.**
 
 [![CI](https://github.com/Lonkins/repo-roast/actions/workflows/ci.yml/badge.svg)](https://github.com/Lonkins/repo-roast/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
@@ -14,20 +14,34 @@
 
 </div>
 
-repo-roast finds **real** security problems in a GitHub target — secrets in commit history, dangerous GitHub Actions workflows, vulnerable dependencies, repo-hygiene tells — and delivers them as a **roast**. The security findings are **deterministic** (gitleaks, OSV.dev, the GitHub API; no LLM required). The comedy is a thin layer on top: a bundled template roaster is funny with **zero spend and zero network**, or bring your own LLM key for freeform wit.
+A huge wave of people now build software with AI assistants but don't yet know the best practices — and AI-generated repos ship a recognizable set of mistakes that no vulnerability database will ever list: a dependency the model **hallucinated** (a name an attacker can register with malware), a service key placed behind `NEXT_PUBLIC_` so it **ships to the browser**, an agent config with the approval gate switched off, a README that promises a `test` script that doesn't exist. repo-roast is built to catch exactly these, alongside the classics — committed secrets, dangerous GitHub Actions, vulnerable dependencies.
 
-It's a funny Trojan horse for a real scanner — and it's self-hostable so you can point it at your **private** repos with your token never leaving your machine.
+Findings are **deterministic** (gitleaks, OSV.dev, live npm/PyPI registry data, the GitHub API; no LLM required, reproducible from a commit SHA). Every finding ships three things: a concrete **fix**, a plain-language **why it bites**, and a copy-paste **prompt for your own AI agent** to apply the fix in your repo — because the audience that ships these mistakes fixes them by pasting. The comedy is a thin layer on top: a bundled template roaster is funny with **zero spend and zero network**, or bring your own LLM key for freeform wit.
 
-## Why it's not just another roast toy
+It's a funny Trojan horse for a serious auditor — and it's self-hostable so you can point it at your **private** repos with your token never leaving your machine.
 
-Most "roast my GitHub" tools are style jokes over an LLM with no substance and unbounded cost. repo-roast is the opposite:
+## Why it's not just another roast toy — or another linter
 
-- **The findings are real and deterministic** — every burn is backed by a scanner rule, evidence, and a location. The LLM (optional) only _phrases_ findings that already exist; it can never invent a vulnerability.
-- **Every burn ships a fix.** The joke is the sugar; the fix is the medicine.
+Most "roast my GitHub" tools are style jokes over an LLM with no substance. And the serious incumbents — OpenSSF Scorecard, SonarQube, Snyk — grade or gate for an audience that _already knows what good looks like_. repo-roast sits in the gap between them:
+
+- **It targets AI-authorship failure modes** the incumbents were designed before and don't hunt for — hallucinated/typosquatted deps, secrets leaked to the client bundle, agent/MCP attack surface, docs that don't match the repo. (Deliberately **not** a general code-quality tool — that's Sonar's job; see [ADR 0002](docs/adr/0002-ai-authorship-audit-pivot.md).)
+- **The findings are real and deterministic** — every burn is backed by a scanner rule, evidence, and a location. The LLM (optional) only _phrases_ findings that already exist; it can never invent one, change a severity, or move the score.
+- **Every finding teaches and remediates**, not just grades — a fix, a why, and a paste-ready agent prompt. The joke is the sugar; the fix is the medicine.
 - **It punches up at the code, never down at the person.** See [the ethics note](docs/ethics.md). A clean repo gets a grudgingly complimentary roast, not fabricated flaws.
 - **Self-hostable for private repos**, token never leaving your instance — the niche nothing else occupies.
 
 ## What it checks
+
+**The AI-authorship scanners** — what an AI-assisted build ships that no vuln DB lists:
+
+| Scanner       | Finds                                                                                                                                                | Detection                                                               |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Slopsquat** | **hallucinated** dependencies (a name the model invented), typosquats of popular packages, and brand-new "landing pad" packages                      | live npm & PyPI registry data — existence, age, versions, edit-distance |
+| **Exposure**  | server secrets behind a `NEXT_PUBLIC_`/`VITE_` prefix, `dangerouslyAllowBrowser` LLM keys, wildcard CORS, `unsafe-eval` CSP                          | bounded env/config/source inspection (value-redacted)                   |
+| **Agents**    | agent/MCP config with the approval gate off (`--dangerously-skip-permissions`, `autoApprove`), unpinned or remote MCP servers, hardcoded MCP secrets | `.mcp.json` / `.claude` / `.cursor` config + workflow/script parsing    |
+| **Claims**    | a README that documents a `test`/`build` script package.json lacks, a CI badge for a missing workflow, hardcoded "coverage 100%" badges              | README vs. package.json vs. the workflow tree                           |
+
+**The classics** — the security posture, still deterministic:
 
 | Scanner          | Finds                                                                                                                                              | Detection                                                                     |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |

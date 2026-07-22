@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ScanReport } from "@/lib/engine/types";
 import type { Roast } from "@/lib/roast";
 import { ScoreBadge } from "./ScoreBadge";
@@ -51,6 +52,8 @@ export function RoastResult({ report, roast, slug }: RoastResultProps) {
                 title={finding?.title ?? line.findingId}
                 evidenceUrl={finding?.evidence.url}
                 evidencePath={finding?.evidence.path}
+                why={finding?.why}
+                agentPrompt={finding?.agentPrompt}
               />
             );
           })}
@@ -58,6 +61,20 @@ export function RoastResult({ report, roast, slug }: RoastResultProps) {
       )}
 
       <BadgeSnippet slug={slug} />
+
+      <div className="flex flex-col items-center gap-2 rounded-lg border-[3px] border-[var(--color-ember)] bg-[var(--color-stage-raised)] p-5 text-center">
+        <p className="text-lg font-black">Your repo&apos;s turn.</p>
+        <p className="text-sm text-[var(--color-ink-dim)]">
+          Every AI-built repo has a few of these. Find yours before someone else
+          does.
+        </p>
+        <Link
+          href="/"
+          className="mt-1 rounded-md border-[3px] border-[var(--color-ink)] bg-[var(--color-ember)] px-4 py-2 font-bold text-[var(--color-stage)] shadow-[4px_4px_0_0_oklch(0%_0_0/0.55)] transition-transform hover:-translate-y-0.5"
+        >
+          🔥 Roast another repo
+        </Link>
+      </div>
 
       <footer className="border-t-[3px] border-[var(--color-ink)]/20 pt-4 text-sm text-[var(--color-ink-dim)]">
         <p>{roast.outro}</p>

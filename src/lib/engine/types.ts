@@ -5,7 +5,15 @@
 
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 
-export type ScannerId = "secrets" | "workflows" | "deps" | "hygiene";
+export type ScannerId =
+  | "secrets"
+  | "workflows"
+  | "deps"
+  | "hygiene"
+  | "slopsquat"
+  | "exposure"
+  | "agents"
+  | "claims";
 
 /** Where a finding was observed. Everything factual, nothing invented. */
 export interface Evidence {
@@ -35,6 +43,17 @@ export interface Finding {
   evidence: Evidence;
   /** concrete, actionable remediation — every finding ships one */
   fix: string;
+  /**
+   * One plain-language sentence on why this bites you — a concrete failure
+   * story, not a category label. The teaching half of the differentiator.
+   */
+  why?: string;
+  /**
+   * A copy-paste prompt for the user's own AI coding agent (Cursor, Claude
+   * Code, Copilot) to apply the fix in their repo. Never contains secret
+   * values. The remediation half of the differentiator (see ADR 0002).
+   */
+  agentPrompt?: string;
 }
 
 export type ScanTarget =

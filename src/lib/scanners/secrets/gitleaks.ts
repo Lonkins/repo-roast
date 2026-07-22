@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import type { Finding, RepoRef, ScanContext } from "../../engine/types";
+import { leakedCredentialFinding } from "./findings";
 
 const execFileAsync = promisify(execFile);
 
@@ -93,26 +94,17 @@ export async function gitleaksSecrets(
       const key = `${r.RuleID}:${r.File}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      const stillInTree = livePaths.has(r.File);
-      findings.push({
-        id: stillInTree
-          ? "secrets/leaked-credential"
-          : "secrets/leaked-credential-history",
-        scanner: "secrets",
-        severity: "critical",
-        title: stillInTree
-          ? `${r.Description} committed in ${r.File}`
-          : `${r.Description} in commit history (${r.File} since deleted — the secret is still in history)`,
-        evidence: {
-          repo: repoName,
+      findings.push(
+        leakedCredentialFinding(repo, {
           path: r.File,
           ref: r.Commit,
           line: r.StartLine,
           url: `https://github.com/${repoName}/commit/${r.Commit}`,
           detail: `gitleaks rule: ${r.RuleID}. Value redacted — check the commit.`,
-        },
-        fix: `Rotate this credential immediately (assume it is compromised), remove it from the code${stillInTree ? "" : " — deleting the file was not enough; git remembers"} and purge it from history with git-filter-repo or BFG, then force-push and invalidate old clones.`,
-      });
+          stillInTree: livePaths.has(r.File),
+          description: r.Description,
+        }),
+      );
     }
     return findings;
   } finally {
