@@ -53,6 +53,16 @@ describe("exposure scanner", () => {
     expect(findings).toHaveLength(0);
   });
 
+  test("skips test files — their patterns are fixtures, not deployed code", async () => {
+    const findings = await exposureScanner.scan(
+      repo,
+      ctxWith({
+        "src/thing.test.ts": "new OpenAI({ dangerouslyAllowBrowser: true });",
+      }),
+    );
+    expect(findings).toHaveLength(0);
+  });
+
   test("a clean repo produces no findings", async () => {
     const findings = await exposureScanner.scan(
       repo,

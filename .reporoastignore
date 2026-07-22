@@ -1,0 +1,7 @@
+# Paths repo-roast's local scan (CLI / pre-commit hook) skips.
+# Gitignore-lite: one path prefix per line; `#` starts a comment.
+#
+# repo-roast dog-foods its own scanners in the pre-commit hook, and a security
+# scanner's rule sources and test fixtures necessarily contain the very
+# patterns they detect. Exclude them so the self-scan doesn't flag itself.
+src/lib/scanners

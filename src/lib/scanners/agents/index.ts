@@ -5,6 +5,7 @@ import type {
   Scanner,
 } from "../../engine/types";
 import { analyzeAgentFile } from "./rules";
+import { isTestOrFixturePath } from "../ignore";
 
 const MAX_FILES = 25;
 
@@ -36,7 +37,7 @@ function selectFiles(paths: string[]): string[] {
     AGENT_FILE_RES.some((re) => re.test(p)) ||
     FLAG_HOST_RES.some((re) => re.test(p));
   return paths
-    .filter((p) => !IGNORE_RE.test(p) && matches(p))
+    .filter((p) => !IGNORE_RE.test(p) && !isTestOrFixturePath(p) && matches(p))
     .sort((a, b) => a.localeCompare(b))
     .slice(0, MAX_FILES);
 }
