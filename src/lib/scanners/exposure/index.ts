@@ -5,6 +5,7 @@ import type {
   Scanner,
 } from "../../engine/types";
 import { analyzeFile } from "./rules";
+import { isTestOrFixturePath } from "../ignore";
 
 /** Bound the file reads so a huge repo stays within API limits. */
 const MAX_FILES = 30;
@@ -27,7 +28,9 @@ function selectFiles(paths: string[]): string[] {
     return 99;
   };
   return paths
-    .filter((p) => !IGNORE_RE.test(p) && rank(p) < 99)
+    .filter(
+      (p) => !IGNORE_RE.test(p) && !isTestOrFixturePath(p) && rank(p) < 99,
+    )
     .sort((a, b) => rank(a) - rank(b) || a.localeCompare(b))
     .slice(0, MAX_FILES);
 }

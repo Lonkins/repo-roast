@@ -6,6 +6,7 @@ import {
   ollamaBackend,
   openaiBackend,
 } from "./llm-roaster";
+import { claudeCliBackend } from "./claude-cli-roaster";
 
 export type { Roast, RoastLine, RoastProvider } from "./types";
 export { templateRoaster } from "./template-roaster";
@@ -22,16 +23,24 @@ export function getRoaster(
   const provider = (env.ROAST_PROVIDER ?? "template").toLowerCase();
 
   switch (provider) {
-    case "anthropic":
-      if (env.ANTHROPIC_API_KEY) {
+    case "anthropic": {
+      const model = env.ANTHROPIC_MODEL ?? "claude-haiku-4-5-20251001";
+      // Prefer a Claude OAuth bearer token (reuse an existing login) over a
+      // pasted API key. Source it from the supported CLI, e.g.
+      // `ant auth print-credentials --access-token`; it is short-lived.
+      if (env.ANTHROPIC_AUTH_TOKEN) {
         return createLlmRoaster(
-          anthropicBackend(
-            env.ANTHROPIC_API_KEY,
-            env.ANTHROPIC_MODEL ?? "claude-haiku-4-5-20251001",
-          ),
+          anthropicBackend(env.ANTHROPIC_AUTH_TOKEN, model, true),
         );
       }
+      if (env.ANTHROPIC_API_KEY) {
+        return createLlmRoaster(anthropicBackend(env.ANTHROPIC_API_KEY, model));
+      }
       return templateRoaster;
+    }
+    // Reuse the local `claude` CLI's own auth — no key or token in repo-roast.
+    case "claude-cli":
+      return createLlmRoaster(claudeCliBackend(env.CLAUDE_CLI_BIN));
     case "openai":
       if (env.OPENAI_API_KEY) {
         return createLlmRoaster(

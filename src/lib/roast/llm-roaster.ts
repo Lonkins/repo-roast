@@ -95,8 +95,24 @@ export function createLlmRoaster(backend: LlmBackend): RoastProvider {
   };
 }
 
-/** Anthropic Messages API backend (BYO key). */
-export function anthropicBackend(apiKey: string, model: string): LlmBackend {
+/**
+ * Anthropic Messages API backend. Auth is either a plain API key (`x-api-key`)
+ * or, when `useOAuth` is set, a short-lived OAuth bearer token — the way to reuse
+ * an existing Claude login instead of a pasted key. Per the Anthropic auth
+ * contract an OAuth token goes on `Authorization: Bearer` PLUS the
+ * `anthropic-beta: oauth-2025-04-20` header, never on `x-api-key`.
+ */
+export function anthropicBackend(
+  credential: string,
+  model: string,
+  useOAuth = false,
+): LlmBackend {
+  const authHeaders: Record<string, string> = useOAuth
+    ? {
+        authorization: `Bearer ${credential}`,
+        "anthropic-beta": "oauth-2025-04-20",
+      }
+    : { "x-api-key": credential };
   return {
     name: "anthropic",
     async complete(system, user) {
@@ -104,8 +120,8 @@ export function anthropicBackend(apiKey: string, model: string): LlmBackend {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "x-api-key": apiKey,
           "anthropic-version": "2023-06-01",
+          ...authHeaders,
         },
         body: JSON.stringify({
           model,

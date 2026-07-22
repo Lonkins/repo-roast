@@ -1,5 +1,9 @@
-import { describe, expect, test } from "vitest";
-import { createLlmRoaster, type LlmBackend } from "./llm-roaster";
+import { describe, expect, test, vi } from "vitest";
+import {
+  anthropicBackend,
+  createLlmRoaster,
+  type LlmBackend,
+} from "./llm-roaster";
 import { getRoaster } from "./index";
 import { CLEAN_REPORT, MESSY_REPORT } from "./fixtures";
 
@@ -82,5 +86,49 @@ describe("getRoaster", () => {
 
   test("selects ollama without needing a key", () => {
     expect(getRoaster({ ROAST_PROVIDER: "ollama" }).name).toBe("ollama");
+  });
+
+  test("selects anthropic with only an OAuth token (no api key)", () => {
+    expect(
+      getRoaster({ ROAST_PROVIDER: "anthropic", ANTHROPIC_AUTH_TOKEN: "t" })
+        .name,
+    ).toBe("anthropic");
+  });
+
+  test("selects the claude-cli provider without a key", () => {
+    expect(getRoaster({ ROAST_PROVIDER: "claude-cli" }).name).toBe(
+      "claude-cli",
+    );
+  });
+});
+
+describe("anthropicBackend auth", () => {
+  function captureFetch(): { headers: () => Record<string, string> } {
+    let seen: Record<string, string> = {};
+    vi.stubGlobal("fetch", async (_url: string, init: RequestInit) => {
+      seen = init.headers as Record<string, string>;
+      return {
+        ok: true,
+        json: async () => ({ content: [{ type: "text", text: "[]" }] }),
+      } as Response;
+    });
+    return { headers: () => seen };
+  }
+
+  test("uses x-api-key by default", async () => {
+    const cap = captureFetch();
+    await anthropicBackend("KEY", "m").complete("s", "u");
+    vi.unstubAllGlobals();
+    expect(cap.headers()["x-api-key"]).toBe("KEY");
+    expect(cap.headers().authorization).toBeUndefined();
+  });
+
+  test("uses a Bearer token + oauth beta header when useOAuth is set", async () => {
+    const cap = captureFetch();
+    await anthropicBackend("TOK", "m", true).complete("s", "u");
+    vi.unstubAllGlobals();
+    expect(cap.headers().authorization).toBe("Bearer TOK");
+    expect(cap.headers()["anthropic-beta"]).toBe("oauth-2025-04-20");
+    expect(cap.headers()["x-api-key"]).toBeUndefined();
   });
 });

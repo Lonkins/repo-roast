@@ -78,12 +78,23 @@ cp .env.example .env       # optional — public mode works empty
 docker compose up --build  # http://localhost:3000
 ```
 
+## Scan before you push (local CLI + pre-commit)
+
+Catch these in your own working tree — before anything reaches GitHub — with the local scanner. It runs the same engine against your checkout (no API, offline), skipping the two network scanners with `--no-network`:
+
+```bash
+pnpm scan --no-network --fail-on high    # exits non-zero if anything ≥ high
+```
+
+Wire it into [pre-commit](https://pre-commit.com) so a leaked-to-client key or an unpinned MCP server can't get committed — see the `repo-roast-audit` hook in [`.pre-commit-config.yaml`](.pre-commit-config.yaml). A `.reporoastignore` (gitignore-lite: one path prefix per line) excludes vendored code, generated files, or intentional test data.
+
 ## The comedy layer (optional, BYO)
 
 The default **template roaster** is deterministic, funny, and free. For freeform wit, set `ROAST_PROVIDER`:
 
 - `ollama` — local model, zero cost, nothing leaves your machine
-- `anthropic` / `openai` — BYO key
+- `claude-cli` — shell out to your already-authenticated `claude` CLI; reuses your existing Claude login (subscription _or_ key) and repo-roast never handles a token
+- `anthropic` / `openai` — BYO key. For Anthropic you can set `ANTHROPIC_AUTH_TOKEN` (a short-lived OAuth bearer token, e.g. from `ant auth print-credentials --access-token`) instead of a pasted `ANTHROPIC_API_KEY`
 
 The LLM only phrases the real findings; fixes always come from the scanner, and any LLM error degrades gracefully to the template roaster.
 

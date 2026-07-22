@@ -29,3 +29,11 @@ repos:
         entry: bash -c 'test -f package.json || exit 0; pnpm exec tsc --noEmit'
         types_or: [ts, tsx]
         pass_filenames: false
+      # Dog-food: audit the working tree with our own AI-authorship scanners.
+      # --no-network skips the registry/OSV scanners (slopsquat, deps) so the
+      # hook stays fast and offline; gitleaks (above) covers secrets in history.
+      - id: repo-roast-audit
+        name: repo-roast (AI-authorship audit)
+        language: system
+        entry: bash -c 'test -f package.json || exit 0; pnpm exec tsx src/cli/scan.ts --no-network --fail-on high'
+        pass_filenames: false
